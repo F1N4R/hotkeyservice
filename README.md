@@ -45,6 +45,8 @@ Der `HotkeyService` fungiert als Vermittler:
 
 ## Installation
 
+WICHTIG! Bitte ändere im Script hotkeyservice.py das `SECRET = "Super_Geheimes_Secret"` in Zeile 25.
+
 ### Voraussetzungen
 
 ```bash
