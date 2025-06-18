@@ -2,10 +2,39 @@ import socket
 import time
 import keyboard
 import pythoncom
+import hashlib
+import hmac
 import win32com.client
+from datetime import datetime
 from threading import Thread
 
+BLOCKED_HOTKEYS = {
+    "win+l", "win+r", "ctrl+alt+del", "alt+f4", "win+d", "win+tab",
+    "win+e", "win+x", "ctrl+shift+esc",
+    
+    "win+r cmd enter", "win+r powershell enter", "win+r regedit enter",
+    "win+r msconfig enter", "ctrl+`", "ctrl+shift+p",
+    
+    "ctrl+t", "ctrl+w", "ctrl+shift+n", "alt+d",
+    
+    "ctrl+a", "ctrl+x", "ctrl+c", "ctrl+v", "del", "shift+del",
+    
+    "f5", "f11", "alt+enter", "~",
+}
+
+SECRET = "Super_Geheimes_Secret"
+
+def generate_token(keys):
+    now = datetime.now().strftime("%Y-%m-%d-%H")
+    return hmac.new(str.encode(SECRET), f"{now}_{keys}".encode(), hashlib.sha256).hexdigest()
+
+def is_valid_token(client_token, keys):
+    return hmac.compare_digest(client_token, generate_token(keys))
+
 def send_hotkey(hotkey_sequence):
+    if hotkey_sequence in BLOCKED_HOTKEYS:
+        print(f"Blocked dangerous hotkey: {hotkey_sequence}")
+        return
     try:
         keyboard.send(hotkey_sequence)
         print(f"Sent hotkey: {hotkey_sequence}")
@@ -32,13 +61,17 @@ def listen_for_commands():
                 print(f"Connected by {addr}")
                 data = conn.recv(1024).decode('utf-8')
                 if data:
+                    token, keys = data.split(":", 1)
+                    if not is_valid_token(token, keys):
+                        print(f"Invalid Token: {token}")
+                        conn.close()
+                        continue
                     print(f"Received command: {data}")
-                    send_hotkey(data.strip().lower())
+                    send_hotkey(keys.strip().lower())
                 conn.sendall(b"ACK")  # Bestätigung senden
                 conn.close()
 
 if __name__ == "__main__":
-    # Stelle sicher, dass COM für win32 funktioniert
     pythoncom.CoInitialize()
     
     # Starte den Befehl-Listener in einem Thread
@@ -47,6 +80,6 @@ if __name__ == "__main__":
     
     try:
         while True:
-            time.sleep(10)  # Hauptthread am Laufen halten
+            time.sleep(100)  # keepalive
     except KeyboardInterrupt:
         print("Service stopped.")
