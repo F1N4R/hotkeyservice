@@ -61,7 +61,7 @@ Wenn es im Hintergrund ausgeführt werden soll kann man die Datei einfach in `h
 
 ### Installation in der Aufgabenplanung
 
-Kompiliere das Script zum Beispiel mit `auto-py-to-exe` zu einer `Windows Based (hide the console)` Anwendung.
+Kompiliere das Script zum Beispiel mit [`auto-py-to-exe`](https://github.com/brentvollebregt/auto-py-to-exe) zu einer `Windows Based (hide the console)` Anwendung.
 
 **In der Aufgabenplanung `taskschd.msc` dann eine neue Einfache Aufgabe erstellen**
 
