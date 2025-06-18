@@ -1,4 +1,9 @@
-import socket, sys
+import socket, sys, hashlib, hmac
+from datetime import datetime
+
+def generate_token(SECRET, keys):
+    now = datetime.now().strftime("%Y-%m-%d-%H")
+    return hmac.new(str.encode(SECRET), f"{now}_{keys}".encode(), hashlib.sha256).hexdigest()
 
 def send_message(msg:str):
     host = '127.0.0.1'
@@ -8,9 +13,13 @@ def send_message(msg:str):
         s.connect((host, port))
         s.sendall(msg.encode('utf-8'))
         r = s.recv(1024).decode()
-        print('Server: ' + r)
+        if r == "" or None : print('Server: No Response')
+        else: print(f'Server: {r}')
     
 if __name__ == '__main__':
     for arg in sys.argv:
         if arg.startswith("-"):
-            send_message(arg[1:])
+            token, keys = arg[1:].split(":", 1)
+            hashed_token = generate_token(token, keys)
+            try: send_message(f'{hashed_token}:{keys}')
+            except: print(f'error: {hashed_token}:{keys}')
