@@ -22,6 +22,11 @@ BLOCKED_HOTKEYS = {
     "f5", "f11", "alt+enter", "~",
 }
 
+ALIAS =	{
+  "next": "next track",
+  "previous": "previous track",
+}
+
 SECRET = "Super_Geheimes_Secret"
 
 def generate_token(keys):
@@ -32,6 +37,7 @@ def is_valid_token(client_token, keys):
     return hmac.compare_digest(client_token, generate_token(keys))
 
 def send_hotkey(hotkey_sequence):
+    if hotkey_sequence in ALIAS: hotkey_sequence = ALIAS[hotkey_sequence]
     if hotkey_sequence in BLOCKED_HOTKEYS:
         print(f"Blocked dangerous hotkey: {hotkey_sequence}")
         return
