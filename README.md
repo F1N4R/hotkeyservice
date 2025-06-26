@@ -50,7 +50,7 @@ WICHTIG! Bitte ändere im Script hotkeyservice.py das `SECRET = "Super_Geheimes_
 ### Voraussetzungen
 
 ```bash
-pip install keyboard
+pip install keyboard pywin32
 ```
 
 ### Ausführen
